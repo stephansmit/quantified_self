@@ -1,0 +1,215 @@
+{
+	"name": "ingestMoodpanda",
+	"properties": {
+		"folder": {
+			"name": "Ingest"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "ingestpool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "fb5f841c-ed33-47a9-b8f0-1ba9e96cb406"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/4c177dc8-b6c0-4b70-a3af-64a7f36d02ee/resourceGroups/quant-self-dev-rg/providers/Microsoft.Synapse/workspaces/quant-self-dev-syn/bigDataPools/ingestpool",
+				"name": "ingestpool",
+				"type": "Spark",
+				"endpoint": "https://quant-self-dev-syn.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ingestpool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"!pip install azure-keyvault"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"import requests\r\n",
+					"from azure.keyvault.secrets import SecretClient\r\n",
+					"from azure.identity import DefaultAzureCredential"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"KEY_VAULT_NAME = 'quant-self-dev-kv'\r\n",
+					"SECRET_NAME_MOODPANDA_PASSWORD = 'moodpanda-password'\r\n",
+					"SECRET_NAME_MOODPANDA_USERNAME = 'moodpanda-username'"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_PASSWORD, \"quantselfkv\")\r\n",
+					""
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"credential = DefaultAzureCredential()\r\n",
+					"client = SecretClient(vault_url=f\"https://{KEY_VAULT_NAME}.vault.azure.net/\", credential=credential)\r\n",
+					"moodpanda_password = client.get_secret(SECRET_NAME_MOODPANDA_PASSWORD).value\r\n",
+					"moodpanda_username = client.get_secret(SECRET_NAME_MOODPANDA_USERNAME).value\r\n",
+					""
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"auth_data = {\"username\": moodpanda_username, \r\n",
+					"             \"password\": moodpanda_password} \r\n",
+					"headers = {\"Content-Type\": \"application/json\"}\r\n",
+					"AUTH_URL = \"https://moodpanda.com/api/users/authenticate\"\r\n",
+					"auth_resp = requests.post(url=AUTH_URL,\r\n",
+					"                          json=auth_data,\r\n",
+					"                          headers=headers,\r\n",
+					"                          timeout=5)\r\n",
+					"jwt_token = auth_resp.json()[\"jwtToken\"]"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# get the ratings\r\n",
+					"RATING_URL = \"https://moodpanda.com/api/ratings/me\"\r\n",
+					"\r\n",
+					"header_w_jwt = {\"Authorization\": f\"Bearer {jwt_token}\",\r\n",
+					"                \"Content-Type\": \"application/json\"}\r\n",
+					"\r\n",
+					"rating_resp = requests.get(RATING_URL,\r\n",
+					"                           headers=header_w_jwt,\r\n",
+					"                           timeout=5)\r\n",
+					"mood_data = rating_resp.json()"
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
