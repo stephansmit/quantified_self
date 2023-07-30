@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fb5f841c-ed33-47a9-b8f0-1ba9e96cb406"
+				"spark.autotune.trackingId": "df83913a-a1ea-4563-9555-ae524a59735f"
 			}
 		},
 		"metadata": {
@@ -65,79 +65,38 @@
 					}
 				},
 				"source": [
-					"!pip install azure-keyvault"
+					"import requests"
 				],
-				"execution_count": 2
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"import requests\r\n",
-					"from azure.keyvault.secrets import SecretClient\r\n",
-					"from azure.identity import DefaultAzureCredential"
-				],
-				"execution_count": 7
+				"execution_count": 4
 			},
 			{
 				"cell_type": "code",
 				"source": [
 					"KEY_VAULT_NAME = 'quant-self-dev-kv'\r\n",
+					"LINKED_SERVICE_NAME = 'quantselfkv'\r\n",
 					"SECRET_NAME_MOODPANDA_PASSWORD = 'moodpanda-password'\r\n",
 					"SECRET_NAME_MOODPANDA_USERNAME = 'moodpanda-username'"
 				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"moodpanda_password = TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_PASSWORD, LINKED_SERVICE_NAME)\r\n",
+					"moodpanda_username = TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_USERNAME, LINKED_SERVICE_NAME)"
+				],
 				"execution_count": 8
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_PASSWORD, \"quantselfkv\")\r\n",
-					""
-				],
-				"execution_count": 16
-			},
-			{
-				"cell_type": "code",
-				"metadata": {
-					"jupyter": {
-						"source_hidden": false,
-						"outputs_hidden": false
-					},
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					"credential = DefaultAzureCredential()\r\n",
-					"client = SecretClient(vault_url=f\"https://{KEY_VAULT_NAME}.vault.azure.net/\", credential=credential)\r\n",
-					"moodpanda_password = client.get_secret(SECRET_NAME_MOODPANDA_PASSWORD).value\r\n",
-					"moodpanda_username = client.get_secret(SECRET_NAME_MOODPANDA_USERNAME).value\r\n",
-					""
-				],
-				"execution_count": 12
 			},
 			{
 				"cell_type": "code",
@@ -163,7 +122,7 @@
 					"                          timeout=5)\r\n",
 					"jwt_token = auth_resp.json()[\"jwtToken\"]"
 				],
-				"execution_count": 11
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -190,7 +149,7 @@
 					"                           timeout=5)\r\n",
 					"mood_data = rating_resp.json()"
 				],
-				"execution_count": null
+				"execution_count": 10
 			},
 			{
 				"cell_type": "code",
@@ -206,9 +165,13 @@
 					}
 				},
 				"source": [
+					"import pandas as pd\r\n",
+					"\r\n",
+					"df = pd.DataFrame(mood_data)\r\n",
+					"df.to_csv('abfss://datalake/ingest/moodpanda')\r\n",
 					""
 				],
-				"execution_count": null
+				"execution_count": 14
 			}
 		]
 	}
