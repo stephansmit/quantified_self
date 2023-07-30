@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-sqlOnDemand--quant-self-dev-syn",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/4c177dc8-b6c0-4b70-a3af-64a7f36d02ee/resourceGroups/quant-self-dev-rg/providers/Microsoft.Synapse/workspaces/quant-self-dev-syn",
+		"groupId": "sqlOnDemand",
+		"fqdns": [
+			"quant-self-dev-syn-ondemand.fac86efe-fcde-4728-87ab-62ee1d20b785.sql.azuresynapse.net"
+		]
+	}
+}
