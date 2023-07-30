@@ -26,6 +26,15 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('workspaceName'), '/ingestpool')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/quant-self-dev-syn-WorkspaceDefaultSqlServer')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -226,7 +235,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "df83913a-a1ea-4563-9555-ae524a59735f"
+						"spark.autotune.trackingId": "3ac5454a-ab2d-488d-a666-d37c094817eb"
 					}
 				},
 				"metadata": {
@@ -251,7 +260,8 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28
+						"memory": 28,
+						"automaticScaleJobs": false
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -277,6 +287,26 @@
 					},
 					{
 						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"print(spark.sparkContext.environment.get(\"environmentName\", None))"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
 						"source": [
 							"KEY_VAULT_NAME = 'quant-self-dev-kv'\r\n",
 							"LINKED_SERVICE_NAME = 'quantselfkv'\r\n",
@@ -424,6 +454,12 @@
 				"nodeSizeFamily": "MemoryOptimized",
 				"sparkVersion": "3.3",
 				"isComputeIsolationEnabled": false,
+				"sparkConfigProperties": {
+					"configurationType": "Artifact",
+					"filename": "sparkConfiguration",
+					"content": "{\"name\":\"sparkConfiguration\",\"properties\":{\"configs\":{\"spark.executorEnv.environmentName\":\"dev\"},\"annotations\":[],\"type\":\"Microsoft.Synapse/workspaces/sparkconfigurations\",\"description\":\"\",\"notes\":\"\",\"created\":\"2023-07-30T17:00:02.2360000+02:00\",\"createdBy\":\"stephansmit@hotmail.com\",\"configMergeRule\":{\"admin.currentOperation.spark.executorEnv.environmentName\":\"replace\"}}}",
+					"time": "2023-07-30T15:03:44.9664989Z"
+				},
 				"sessionLevelPackagesEnabled": false,
 				"annotations": []
 			},
