@@ -7,7 +7,7 @@
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
-			"referenceName": "ingestpool",
+			"referenceName": "ingestpoolv2",
 			"type": "BigDataPoolReference"
 		},
 		"sessionProperties": {
@@ -20,7 +20,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "64c4772d-36d1-401d-a015-b03f7dceb2d2"
+				"spark.autotune.trackingId": "1b9097b4-5ca8-4f3a-9520-717fe1a78e5c"
 			}
 		},
 		"metadata": {
@@ -34,10 +34,10 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/4c177dc8-b6c0-4b70-a3af-64a7f36d02ee/resourceGroups/quant-self-dev-rg/providers/Microsoft.Synapse/workspaces/quant-self-dev-syn/bigDataPools/ingestpool",
-				"name": "ingestpool",
+				"id": "/subscriptions/4c177dc8-b6c0-4b70-a3af-64a7f36d02ee/resourceGroups/quant-self-dev-rg/providers/Microsoft.Synapse/workspaces/quant-self-dev-syn/bigDataPools/ingestpoolv2",
+				"name": "ingestpoolv2",
 				"type": "Spark",
-				"endpoint": "https://quant-self-dev-syn.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ingestpool",
+				"endpoint": "https://quant-self-dev-syn.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/ingestpoolv2",
 				"auth": {
 					"type": "AAD",
 					"authResource": "https://dev.azuresynapse.net"
@@ -67,7 +67,7 @@
 				"source": [
 					"import requests"
 				],
-				"execution_count": 2
+				"execution_count": 1
 			},
 			{
 				"cell_type": "code",
@@ -85,7 +85,7 @@
 				"source": [
 					"print(spark.sparkContext.environment.get(\"environmentName\", None))"
 				],
-				"execution_count": 3
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -95,7 +95,7 @@
 					"SECRET_NAME_MOODPANDA_PASSWORD = 'moodpanda-password'\r\n",
 					"SECRET_NAME_MOODPANDA_USERNAME = 'moodpanda-username'"
 				],
-				"execution_count": 6
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -114,7 +114,7 @@
 					"moodpanda_password = TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_PASSWORD, LINKED_SERVICE_NAME)\r\n",
 					"moodpanda_username = TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_USERNAME, LINKED_SERVICE_NAME)"
 				],
-				"execution_count": 8
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -140,7 +140,7 @@
 					"                          timeout=5)\r\n",
 					"jwt_token = auth_resp.json()[\"jwtToken\"]"
 				],
-				"execution_count": 9
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -167,7 +167,7 @@
 					"                           timeout=5)\r\n",
 					"mood_data = rating_resp.json()"
 				],
-				"execution_count": 10
+				"execution_count": null
 			},
 			{
 				"cell_type": "code",
@@ -189,7 +189,7 @@
 					"df.to_csv('abfss://datalake/ingest/moodpanda')\r\n",
 					""
 				],
-				"execution_count": 14
+				"execution_count": null
 			}
 		]
 	}
