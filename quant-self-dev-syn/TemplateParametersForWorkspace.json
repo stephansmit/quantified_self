@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "quant-self-dev-syn"
+		},
+		"quant-self-dev-syn-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:quant-self-dev-syn.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"quant-self-dev-syn-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://quantselfdevsa.dfs.core.windows.net/"
+		},
+		"quantselfkv_properties_typeProperties_baseUrl": {
+			"value": "https://quant-self-dev-kv.vault.azure.net/"
+		}
+	}
+}
