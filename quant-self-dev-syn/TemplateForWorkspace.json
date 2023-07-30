@@ -26,15 +26,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/ingestpool')]",
-			"type": "Microsoft.Synapse/workspaces/bigDataPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/quant-self-dev-syn-WorkspaceDefaultSqlServer')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -235,7 +226,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e5e53014-8810-47ca-9ac9-e2dbac387867"
+						"spark.autotune.trackingId": "df83913a-a1ea-4563-9555-ae524a59735f"
 					}
 				},
 				"metadata": {
@@ -260,8 +251,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -280,85 +270,41 @@
 							}
 						},
 						"source": [
-							"!pip install azure-keyvault"
+							"import requests"
 						],
 						"outputs": [],
-						"execution_count": 2
+						"execution_count": 4
 					},
 					{
 						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"import requests\r\n",
-							"from azure.keyvault.secrets import SecretClient\r\n",
-							"from azure.identity import DefaultAzureCredential"
-						],
-						"outputs": [],
-						"execution_count": 7
-					},
-					{
-						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"KEY_VAULT_NAME = 'quant-self-dev-kv'\r\n",
+							"LINKED_SERVICE_NAME = 'quantselfkv'\r\n",
 							"SECRET_NAME_MOODPANDA_PASSWORD = 'moodpanda-password'\r\n",
 							"SECRET_NAME_MOODPANDA_USERNAME = 'moodpanda-username'"
 						],
 						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"moodpanda_password = TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_PASSWORD, LINKED_SERVICE_NAME)\r\n",
+							"moodpanda_username = TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_USERNAME, LINKED_SERVICE_NAME)"
+						],
+						"outputs": [],
 						"execution_count": 8
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"TokenLibrary.getSecret(KEY_VAULT_NAME, SECRET_NAME_MOODPANDA_PASSWORD, \"quantselfkv\")\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 16
-					},
-					{
-						"cell_type": "code",
-						"metadata": {
-							"jupyter": {
-								"source_hidden": false,
-								"outputs_hidden": false
-							},
-							"nteract": {
-								"transient": {
-									"deleting": false
-								}
-							}
-						},
-						"source": [
-							"credential = DefaultAzureCredential()\r\n",
-							"client = SecretClient(vault_url=f\"https://{KEY_VAULT_NAME}.vault.azure.net/\", credential=credential)\r\n",
-							"moodpanda_password = client.get_secret(SECRET_NAME_MOODPANDA_PASSWORD).value\r\n",
-							"moodpanda_username = client.get_secret(SECRET_NAME_MOODPANDA_USERNAME).value\r\n",
-							""
-						],
-						"outputs": [],
-						"execution_count": 12
 					},
 					{
 						"cell_type": "code",
@@ -385,7 +331,7 @@
 							"jwt_token = auth_resp.json()[\"jwtToken\"]"
 						],
 						"outputs": [],
-						"execution_count": 11
+						"execution_count": 9
 					},
 					{
 						"cell_type": "code",
@@ -413,7 +359,7 @@
 							"mood_data = rating_resp.json()"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 10
 					},
 					{
 						"cell_type": "code",
@@ -429,12 +375,33 @@
 							}
 						},
 						"source": [
+							"import pandas as pd\r\n",
+							"\r\n",
+							"df = pd.DataFrame(mood_data)\r\n",
+							"df.to_csv('abfss://datalake/ingest/moodpanda')\r\n",
 							""
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 14
 					}
 				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sparkConfiguration')]",
+			"type": "Microsoft.Synapse/workspaces/sparkConfigurations",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"configs": {
+					"spark.executorEnv.environmentName": "dev"
+				},
+				"created": "2023-07-30T17:00:02.2360000+02:00",
+				"createdBy": "stephansmit@hotmail.com",
+				"annotations": [],
+				"configMergeRule": {
+					"artifact.currentOperation.spark.executorEnv.environmentName": "replace"
+				}
 			},
 			"dependsOn": []
 		},
