@@ -1,0 +1,14 @@
+{
+	"name": "sparkConfiguration",
+	"properties": {
+		"configs": {
+			"spark.executorEnv.environmentName": "dev"
+		},
+		"created": "2023-07-30T17:00:02.2360000+02:00",
+		"createdBy": "stephansmit@hotmail.com",
+		"annotations": [],
+		"configMergeRule": {
+			"artifact.currentOperation.spark.executorEnv.environmentName": "replace"
+		}
+	}
+}
